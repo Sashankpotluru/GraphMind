@@ -52,6 +52,18 @@ def extract_member(archive, spec, path):
             shutil.copyfileobj(src, dest)
 
 
+def open_url(url):
+    """Use verified HTTPS even on Python distributions installed without a CA bundle."""
+    import ssl
+
+    context = ssl.create_default_context()
+    if not context.get_ca_certs():
+        import certifi
+
+        context.load_verify_locations(certifi.where())
+    return urllib.request.urlopen(url, timeout=120, context=context)
+
+
 def fetch(cache):
     for spec in sorted(DATA + MODEL, key=lambda row: "archive_member" in row):
         path = cache / Path(spec["path"]).relative_to("data/cache")
@@ -71,7 +83,7 @@ def fetch(cache):
                         raise ValueError("archive download failed")
                 else:
                     with (
-                        urllib.request.urlopen(spec["url"], timeout=120) as src,
+                        open_url(spec["url"]) as src,
                         temp.open("wb") as dest,
                     ):
                         shutil.copyfileobj(src, dest)

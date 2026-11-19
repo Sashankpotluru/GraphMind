@@ -1,0 +1,149 @@
+{
+  "answers": [
+    {
+      "path": "binding.json",
+      "bytes": 8556,
+      "sha256": "522092907ff908b3bbae491f3acb3f37f9febf231acc09467fda2044ee864b8e"
+    },
+    {
+      "path": "elapsed.json",
+      "bytes": 68,
+      "sha256": "d8899b55e90fe135d94799abcc0bcf76d94e7fd3228a257ee7e6609c0caa4b59"
+    },
+    {
+      "path": "hotpot/inputs/0000.jsonl.gz",
+      "bytes": 44723,
+      "sha256": "7305b37041600f489f2e699bc5c23e5c6e8f8e46651c3bc48700ee08522e6298"
+    },
+    {
+      "path": "hotpot/inputs/0001.jsonl.gz",
+      "bytes": 41365,
+      "sha256": "38880c477f0ed8d7923ebf44e4acc33954fc06d757377962fd6a70ddd03173ee"
+    },
+    {
+      "path": "hotpot/inputs/0002.jsonl.gz",
+      "bytes": 43588,
+      "sha256": "fdb4a0513217bb06dc5697d58cc2667f29fc400eedceaef7bf99378c09114e52"
+    },
+    {
+      "path": "hotpot/inputs/0003.jsonl.gz",
+      "bytes": 43242,
+      "sha256": "e88ce649c66b8b1ec4f64c81489448173d9683768ad19cef8f05301ae9d0858d"
+    },
+    {
+      "path": "hotpot/inputs/0004.jsonl.gz",
+      "bytes": 29422,
+      "sha256": "5d3c8263a6352965310bbe4ec2e48139e88388bed4ec8e6312b84925ca0bcf11"
+    },
+    {
+      "path": "hotpot/metrics/0000.jsonl.gz",
+      "bytes": 1350,
+      "sha256": "4352af62cae9ebccdbf2894ee826c18a18369324dd2d4b12dfc5aedd11fee243"
+    },
+    {
+      "path": "hotpot/metrics/0001.jsonl.gz",
+      "bytes": 892,
+      "sha256": "c5b25994ff9d030db22cacfa713a4dbb70811c6aa013dafc54aa0950cfbc17c3"
+    },
+    {
+      "path": "hotpot/predictions/0000.jsonl.gz",
+      "bytes": 1855,
+      "sha256": "68de8bd8d2fd144209e627b9acb692be2b84bb4bc008151db1109a63f95885da"
+    },
+    {
+      "path": "hotpot/predictions/0001.jsonl.gz",
+      "bytes": 1289,
+      "sha256": "79c87e45367ab4aadd45fbd494e93c3293ba6ceeaeaede69c4c850e7b3c0c5f7"
+    },
+    {
+      "path": "hotpot/predictions/0002.jsonl.gz",
+      "bytes": 1469,
+      "sha256": "39f32d3e551239260d709dcff42233b415094de7294931e5ccc9c908bbcc8fdb"
+    },
+    {
+      "path": "hotpot/predictions/0003.jsonl.gz",
+      "bytes": 1481,
+      "sha256": "1a56d2d90beec091f57d3e31d768c83ff4e7861ea1ad8b70d3bbf205d095defd"
+    },
+    {
+      "path": "hotpot/predictions/0004.jsonl.gz",
+      "bytes": 1108,
+      "sha256": "38b500f4a81b4da6e3a4fc26ed1d0d3b9782579cef91d997ba3d2e35812e54ae"
+    },
+    {
+      "path": "musique/inputs/0000.jsonl.gz",
+      "bytes": 41955,
+      "sha256": "70da36ba54d91e5b91f224fda400c216ebaee2c1042d540657997b58255e7ebc"
+    },
+    {
+      "path": "musique/inputs/0001.jsonl.gz",
+      "bytes": 43048,
+      "sha256": "3e1905059a068000a081a1d2f3656d4d715a02dbfe44cb4d53ef22cb41c636bd"
+    },
+    {
+      "path": "musique/inputs/0002.jsonl.gz",
+      "bytes": 44260,
+      "sha256": "dfba8c934081d2ccb76ec8c25967db4bd9411be07c462041ea86423dafb4d6ad"
+    },
+    {
+      "path": "musique/inputs/0003.jsonl.gz",
+      "bytes": 42246,
+      "sha256": "80e342e7ad63ade94f2638f9a42b07588387d623e4b435e0a1a7c211d4dafb60"
+    },
+    {
+      "path": "musique/inputs/0004.jsonl.gz",
+      "bytes": 28733,
+      "sha256": "3e36f37f4b51238063d28a66fac23138585887262f5769ed9e4382fba62b19f6"
+    },
+    {
+      "path": "musique/metrics/0000.jsonl.gz",
+      "bytes": 1176,
+      "sha256": "175c63a47792a6883b04d3f85a5e5a6c5a0381e429bb7b2002cafc76b5095bfc"
+    },
+    {
+      "path": "musique/metrics/0001.jsonl.gz",
+      "bytes": 774,
+      "sha256": "adc9ab25fe09c4ae2102e6b11c366b30a29a4d5ec52bc104f2278d864f6c2b1f"
+    },
+    {
+      "path": "musique/predictions/0000.jsonl.gz",
+      "bytes": 1345,
+      "sha256": "0aca0acd0bef6f134f392ff2bebce4f570e88f92235f0de4d0a65f5da2fb3d8e"
+    },
+    {
+      "path": "musique/predictions/0001.jsonl.gz",
+      "bytes": 1459,
+      "sha256": "a2ea3fdb3a03f066721a2f29d149fcf3ce05f24da362416c09f32fe190c66b37"
+    },
+    {
+      "path": "musique/predictions/0002.jsonl.gz",
+      "bytes": 1591,
+      "sha256": "603a76e12899606073f41524ed8a8970971c15f423147c6da150e9445925f5ed"
+    },
+    {
+      "path": "musique/predictions/0003.jsonl.gz",
+      "bytes": 1572,
+      "sha256": "0841449b9beb1d3cf77237af591efefcd5119ef0aa8f546f99e594c13ade5071"
+    },
+    {
+      "path": "musique/predictions/0004.jsonl.gz",
+      "bytes": 1031,
+      "sha256": "64b91505da2132ffdc5b713f284084f400b47bee4f6c8a1f738c1c227ff025d4"
+    },
+    {
+      "path": "selection.json",
+      "bytes": 6347,
+      "sha256": "855ad148aa4a0a31d1de7fad4db57e8b463d477fea1f7a0f8ff80869b96c0333"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 4395,
+      "sha256": "05370fe796f82b7b4dccde210f3f9eef82bf3d02ee59a7d1dcdfccacbb9e7d36"
+    },
+    {
+      "path": "weight-audit.json",
+      "bytes": 963,
+      "sha256": "71d304e3f8805904a2c4e543f2e157111265375a522ff9571e9bedab671baeb5"
+    }
+  ]
+}

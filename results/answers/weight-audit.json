@@ -1,0 +1,23 @@
+{
+  "assembly": "post-run-independent-reload",
+  "checkpoint_sha256": "495fa51e204676f1a857a9fc13c4c89f3f5ba9f480b898cebca02add25e6d749",
+  "checkpoint_tensors": 190,
+  "verified_state_tensors": 192,
+  "aliases": {
+    "encoder.embed_tokens.weight": "shared.weight",
+    "decoder.embed_tokens.weight": "shared.weight"
+  },
+  "loader_report": {
+    "missing_keys": [],
+    "unexpected_keys": [],
+    "mismatched_keys": [],
+    "error_msgs": []
+  },
+  "tensor_sha256": {
+    "shared.weight": "cd5f2d611f4e18966877f60feb20a4e1e92046f7701e615c66b4fdf1c040f81e",
+    "lm_head.weight": "b0de41fb4abe564506e5fded7ed9177afb50ec0f3e9e9c060a3f2a038bea6b14"
+  },
+  "loader_warnings": [
+    "The tied weights mapping and config for this model specifies to tie shared.weight to lm_head.weight, but both are present in the checkpoints with different values, so we will NOT tie them. You should update the config with `tie_word_embeddings=False` to silence this warning."
+  ]
+}

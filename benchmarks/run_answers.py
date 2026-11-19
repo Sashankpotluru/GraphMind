@@ -1,11 +1,13 @@
 """Prepare immutable matched reader inputs, then run greedy CPU generation."""
 
 import argparse
+import hashlib
+import io
+import logging
 import os
 import shutil
 import tempfile
 import time
-import urllib.request
 from pathlib import Path
 
 from .generation import FLAN, SETTINGS, analyze, check_output, tokenizer
@@ -18,7 +20,7 @@ from .release import (
     verify_source_files,
 )
 from .run_retrieval import compressed, json_bytes, platform_info, put_json, write_shards
-from .sources import destination, digest, source_binding, verified
+from .sources import destination, digest, open_url, source_binding, verified
 
 
 def fetch_flan(cache):
@@ -28,11 +30,70 @@ def fetch_flan(cache):
             url = f"https://huggingface.co/{FLAN['model']}/resolve/{FLAN['revision']}/{name}"
             with (
                 destination(path, pin) as temp,
-                urllib.request.urlopen(url, timeout=120) as response,
+                open_url(url) as response,
                 temp.open("wb") as f,
             ):
                 shutil.copyfileobj(response, f)
         verified(path, pin)
+
+
+def audited_reader(cache, assembly):
+    import torch
+    from safetensors import safe_open
+    from transformers import AutoModelForSeq2SeqLM
+
+    with tempfile.TemporaryDirectory() as directory:
+        for name, pin in FLAN["files"].items():
+            copied = Path(directory) / name
+            shutil.copyfile(cache / "flan" / name, copied)
+            verified(copied, pin)
+        log = io.StringIO()
+        handler = logging.StreamHandler(log)
+        handler.setLevel(logging.WARNING)
+        logger = logging.getLogger("transformers")
+        logger.addHandler(handler)
+        try:
+            net, info = AutoModelForSeq2SeqLM.from_pretrained(
+                directory,
+                local_files_only=True,
+                use_safetensors=True,
+                trust_remote_code=False,
+                dtype=torch.float32,
+                attn_implementation="eager",
+                output_loading_info=True,
+            )
+        finally:
+            logger.removeHandler(handler)
+        net = net.to("cpu").eval()
+        if any(info.values()):
+            raise ValueError(f"nonempty loading report: {info}")
+        state = net.state_dict()
+        aliases = {
+            "encoder.embed_tokens.weight": "shared.weight",
+            "decoder.embed_tokens.weight": "shared.weight",
+        }
+        with safe_open(str(Path(directory) / "model.safetensors"), framework="pt") as weights:
+            keys = set(weights.keys())
+            if set(state) != keys | aliases.keys():
+                raise ValueError("unexpected parameter membership")
+            for name, value in state.items():
+                target = weights.get_tensor(aliases.get(name, name))
+                if not torch.equal(value, target) or value.dtype != target.dtype:
+                    raise ValueError(f"loaded parameter differs from checkpoint: {name}")
+            hashes = {
+                k: hashlib.sha256(state[k].contiguous().numpy().tobytes()).hexdigest()
+                for k in ("shared.weight", "lm_head.weight")
+            }
+        return net, {
+            "assembly": assembly,
+            "checkpoint_sha256": FLAN["files"]["model.safetensors"]["sha256"],
+            "checkpoint_tensors": len(keys),
+            "verified_state_tensors": len(state),
+            "aliases": aliases,
+            "loader_report": {k: sorted(v) for k, v in info.items()},
+            "tensor_sha256": hashes,
+            "loader_warnings": log.getvalue().splitlines(),
+        }
 
 
 def run(cache, retrieval, root):
@@ -50,7 +111,7 @@ def run(cache, retrieval, root):
     put_json(root / "selection.json", ids)
     os.environ.update(HF_HUB_OFFLINE="1", TOKENIZERS_PARALLELISM="false", OMP_NUM_THREADS="6")
     import torch
-    from transformers import AutoModelForSeq2SeqLM, GenerationConfig
+    from transformers import GenerationConfig
 
     torch.set_num_threads(6)
     torch.set_num_interop_threads(1)
@@ -82,49 +143,34 @@ def run(cache, retrieval, root):
     print("Bound 600 inputs and measurement sources before loading model.", flush=True)
     started = time.monotonic()
     predictions = {}
-    with tempfile.TemporaryDirectory() as verified_dir:
-        for name, pin in FLAN["files"].items():
-            dest = Path(verified_dir) / name
-            shutil.copyfile(cache / "flan" / name, dest)
-            verified(dest, pin)
-        net = (
-            AutoModelForSeq2SeqLM.from_pretrained(
-                verified_dir,
-                local_files_only=True,
-                use_safetensors=True,
-                trust_remote_code=False,
-                dtype=torch.float32,
-                attn_implementation="eager",
-            )
-            .to("cpu")
-            .eval()
-        )
-        with torch.inference_mode():
-            for ds, rows in inputs.items():
-                predictions[ds] = []
-                for i, r in enumerate(rows):
-                    tokens = torch.tensor([r["input_ids"]], dtype=torch.long)
-                    generated = net.generate(
-                        input_ids=tokens,
-                        attention_mask=torch.ones_like(tokens),
-                        generation_config=opts,
+    net, audit = audited_reader(cache, "before-generation")
+    put_json(root / "weight-audit.json", audit)
+    with torch.inference_mode():
+        for ds, rows in inputs.items():
+            predictions[ds] = []
+            for i, r in enumerate(rows):
+                tokens = torch.tensor([r["input_ids"]], dtype=torch.long)
+                generated = net.generate(
+                    input_ids=tokens,
+                    attention_mask=torch.ones_like(tokens),
+                    generation_config=opts,
+                )
+                output = generated[0].tolist()
+                predictions[ds].append(
+                    {
+                        "qid": r["qid"],
+                        "method": r["method"],
+                        "decoder_ids": output,
+                        **check_output(tok, output),
+                    }
+                )
+                if (i + 1) % 64 == 0 or i + 1 == len(rows):
+                    chunk = predictions[ds][(i // 64) * 64 : i + 1]
+                    compressed(
+                        root / ds / "predictions" / f"{i // 64:04}.jsonl.gz",
+                        b"".join(json_bytes(p) + b"\n" for p in chunk),
                     )
-                    output = generated[0].tolist()
-                    predictions[ds].append(
-                        {
-                            "qid": r["qid"],
-                            "method": r["method"],
-                            "decoder_ids": output,
-                            **check_output(tok, output),
-                        }
-                    )
-                    if (i + 1) % 64 == 0 or i + 1 == len(rows):
-                        chunk = predictions[ds][(i // 64) * 64 : i + 1]
-                        compressed(
-                            root / ds / "predictions" / f"{i // 64:04}.jsonl.gz",
-                            b"".join(json_bytes(p) + b"\n" for p in chunk),
-                        )
-                        print(f"{ds}: retained {i + 1}/{len(rows)} predictions", flush=True)
+                    print(f"{ds}: retained {i + 1}/{len(rows)} predictions", flush=True)
     pairs, summaries = analyze(predictions, judgments(retrieval), ids)
     for ds, rows in pairs.items():
         write_shards(root / ds / "metrics", rows)
@@ -141,9 +187,20 @@ def main():
     p.add_argument("--retrieval", type=Path, default=Path("results/retrieval"))
     p.add_argument("--output", type=Path)
     p.add_argument("--download-only", action="store_true")
+    p.add_argument(
+        "--audit-only",
+        action="store_true",
+        help="audit a new verified load without generating answers",
+    )
     args = p.parse_args()
     if args.download_only:
         fetch_flan(args.cache)
+        return
+    if args.audit_only:
+        if not args.output or args.output.exists():
+            p.error("provide a new audit output file")
+        _, audit = audited_reader(args.cache, "post-run-independent-reload")
+        put_json(args.output, audit)
         return
     if not args.output or args.output.exists():
         p.error("provide a new output directory")

@@ -110,3 +110,86 @@ def verify_source_files():
                 b"from .metric import Metric", b"from metrics.metric import Metric", 1
             )
         require_equal(name, item["sha256"], hashlib.sha256(content).hexdigest())
+
+
+def explorer(root):
+    """IDs are in stable coordinate order; each table's shard size is explicit."""
+    from graphmind import build_graph
+
+    retrieval = root / "retrieval"
+    selected = read(root / "answers/selection.json")
+    index = {
+        "schema": 1,
+        "retrieval_shard_size": 64,
+        "answer_shard_size": 64,
+        "graph_shard_size": 8,
+        "methods": list(ANSWER_METHODS),
+        "datasets": {},
+    }
+    graphs = {}
+    for ds in COUNTS:
+        cases = canonical_rows(retrieval, ds, "dev", "cases")
+        by_id = {c["qid"]: c for c in cases}
+        ids = selection(by_id, "graphmind-v1-answer:", 100)
+        require_equal(ds + " explorer membership", ids, selected[ds])
+        index["datasets"][ds] = {"dev_ids": list(by_id), "answer_ids": ids}
+        graphs[ds] = [{"qid": q, "graph": build_graph(by_id[q]["documents"])} for q in ids]
+    return index, graphs
+
+
+def build(observations, output):
+    import shutil
+    import tempfile
+
+    from .run_retrieval import compressed, put_json
+    from .verify import verify
+
+    if output.exists() or observations.resolve() in output.resolve().parents:
+        raise ValueError("release output must be new and outside the observations directory")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    lock = output.parent / ("." + output.name + ".lock")
+    with lock.open("x"):
+        try:
+            with tempfile.TemporaryDirectory(
+                dir=output.parent, prefix="." + output.name + "-"
+            ) as temp:
+                stage = Path(temp) / "release"
+                stage.mkdir()
+                for name in ("retrieval", "answers"):
+                    if any(p.is_symlink() for p in (observations / name).rglob("*")):
+                        raise ValueError("symlinks in observations")
+                    shutil.copytree(observations / name, stage / name)
+                sidecar = observations / "retrieval-provenance.json"
+                if sidecar.exists():
+                    shutil.copyfile(sidecar, stage / sidecar.name)
+                index, graphs = explorer(stage)
+                put_json(stage / "explorer-index.json", index)
+                for ds, rows in graphs.items():
+                    for i in range(0, len(rows), 8):
+                        compressed(
+                            stage / "explorer" / ds / f"{i // 8:04}.jsonl.gz",
+                            b"".join(json_bytes(r) + b"\n" for r in rows[i : i + 8]),
+                        )
+                put_json(stage / "release.json", {"schema": 1, "files": inventory(stage)})
+                verify(stage, recorded=sidecar.exists())
+                if output.exists():
+                    raise FileExistsError(output)
+                stage.rename(output)
+        finally:
+            lock.unlink(missing_ok=True)
+
+
+def main():
+    import argparse
+
+    p = argparse.ArgumentParser(
+        description="Build and verify a new release from completed observations."
+    )
+    p.add_argument("--observations", type=Path, required=True)
+    p.add_argument("--output", type=Path, required=True)
+    opts = p.parse_args()
+    build(opts.observations, opts.output)
+
+
+if __name__ == "__main__":
+    main()

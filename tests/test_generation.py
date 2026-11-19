@@ -67,3 +67,23 @@ def test_reference_scoring_special_cases_and_aliases():
     assert score("musique", "the!", ["a"]) == {"em": 1, "f1": 1}
     assert score("hotpot", "the!", ["a"]) == {"em": 1, "f1": 0}
     assert score("musique", "UK", ["United Kingdom", "the UK"]) == {"em": 1, "f1": 1}
+
+
+def test_float_paired_deltas_survive_cluster_bootstrap():
+    from benchmarks.generation import paired
+
+    single = paired([0.25, 0.5], [[0, 1]])
+    assert single["delta"] == 0.375 and single["cluster_ci95"] is None
+    grouped = paired([0.25, 0.5], [[0], [1]])
+    assert grouped["query_ci95"] == [0.25, 0.5]
+    assert grouped["cluster_ci95"] == [0.25, 0.5]
+    assert 0 < grouped["p"] <= 1
+
+
+def test_no_answer_string_or_support_needed_to_generate_context():
+    docs = [{"id": "one", "title": "Berlin", "text": "The garden opened in 1902."}]
+    prompt = build_prompt(tokenizer(), "Who designed the garden?", docs)
+    assert prompt["passages"][0]["body_end"] == len(docs[0]["text"])
+    for reference in ("Max Planck", "Ada Lovelace"):
+        assert reference not in prompt["text"]
+        assert score("hotpot", "1902", [reference]) == {"em": 0, "f1": 0}
