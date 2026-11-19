@@ -55,7 +55,7 @@ def main(argv: list[str] | None = None) -> int:
         else:
             question = args.question if args.question is not None else case.get("question")
             if args.question_file is not None:
-                question = args.question_file.read_text(encoding="utf-8")
+                question = args.question_file.read_bytes().decode("utf-8")
             if not isinstance(question, str):
                 raise GraphMindError("question", "expected a nonblank string")
             result = retrieve(documents, question, args.depth, args.mix, args.seeds)
@@ -63,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.output:
             _write_new(args.output, data)
         else:
-            sys.stdout.write(data)
+            sys.stdout.buffer.write(data.encode("utf-8"))
     except (ValueError, OSError) as exc:
         field = exc.field if isinstance(exc, GraphMindError) else "io"
         detail = exc.detail if isinstance(exc, GraphMindError) else str(exc)

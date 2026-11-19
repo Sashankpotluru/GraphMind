@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -53,3 +54,30 @@ def test_simultaneous_writers_commit_one_complete_result(tmp_path):
     assert sorted(r.returncode for r in results) == [0, 2]
     assert json.loads(output.read_text())["ranking"][0]["id"] in {"a", "d"}
     assert list(tmp_path.iterdir()) == [output]
+
+
+def test_stdout_is_utf8_under_an_ascii_stream_encoding(tmp_path):
+    corpus = tmp_path / "corpus.json"
+    title = "Café"
+    corpus.write_text(json.dumps([{"id": "p", "title": title, "text": ""}]), encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, "-m", "graphmind.cli", "export", str(corpus)],
+        env={**os.environ, "PYTHONIOENCODING": "ascii"},
+        capture_output=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert title.encode("utf-8") in result.stdout
+    statements = json.loads(result.stdout.decode("utf-8"))["statements"]
+    assert statements[0]["parameters"]["rows"][0]["title"] == title
+
+
+def test_question_file_limit_counts_original_crlf_codepoints(tmp_path):
+    question = tmp_path / "q.txt"
+    question.write_bytes(b"qq" + b"\r\n" * 999)
+    valid = cli("query", FIXTURE, "--question-file", question)
+    assert valid.returncode == 0, valid.stderr
+    question.write_bytes(b"q" + b"\r\n" * 1000)
+    invalid = cli("query", FIXTURE, "--question-file", question)
+    assert invalid.returncode == 2
+    assert json.loads(invalid.stderr)["error"]["field"] == "question"
