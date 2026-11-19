@@ -1,4 +1,12 @@
-import { $, el, option, labels, datasets, percent } from "./dom.mjs";
+import {
+  $,
+  el,
+  option,
+  labels,
+  datasets,
+  percent,
+  contextLabel,
+} from "./dom.mjs";
 import { context, data } from "./data.mjs";
 import { EngineClient } from "./engine-client.mjs";
 import {
@@ -58,6 +66,7 @@ function resetRun() {
   $("run").disabled = false;
 }
 function renderCase(focusAfter) {
+  $("sample-meta").textContent = contextLabel(state.c, state.mode);
   if (!state.c || (isLive() && !state.live)) {
     $("case-content").hidden = true;
     return;
@@ -212,12 +221,6 @@ async function loadCase(ds, j) {
     if (ticket !== revision) return;
     state.c = c;
     $("question").textContent = c.example.question;
-    const stratum = c.judgment.stratum.replace(/^(\d)hop$/, "$1-hop question");
-    $("sample-meta").textContent =
-      (ds === "hotpot" ? stratum + " question" : stratum) +
-      " · " +
-      c.example.documents.length +
-      " candidate paragraphs";
     message("");
     renderCase();
   } catch (error) {

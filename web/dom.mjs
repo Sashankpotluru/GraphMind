@@ -23,6 +23,13 @@ export const labels = {
   "graph-3": "Graph · 3 hops",
 };
 export const datasets = { hotpot: "HotpotQA", musique: "MuSiQue" };
+export function contextLabel(context, mode) {
+  if (!context) return "";
+  const count = context.example.documents.length + " candidate paragraphs";
+  if (mode === "custom") return count;
+  const type = context.judgment.stratum.replace(/^(\d)hop$/, "$1-hop");
+  return type + " question · " + count;
+}
 export const percent = (x) => (100 * x).toFixed(2) + "%";
 export function cellTable(headings, records, caption) {
   const wrap = el("div", undefined, "table-scroll");
