@@ -55,9 +55,12 @@ export class EngineClient {
       this.pending = null;
     }
   }
-  async run(payload) {
-    validatePayload(payload);
+  cancelPending() {
     if (this.pending) this.reset();
+  }
+  async run(payload) {
+    this.cancelPending();
+    validatePayload(payload);
     const worker = (this.worker ??= this.create());
     const id = ++this.serial;
     return new Promise((resolve, reject) => {

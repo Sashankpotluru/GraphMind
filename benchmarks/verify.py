@@ -246,6 +246,30 @@ def timing(path, qids):
     require_equal("timing percentiles", summary, read(path / "timing-summary.json"))
 
 
+def verified_bm25(case, observed):
+    """Check every score before replaying ranks with the original rounding of near ties."""
+    docs = case["documents"]
+    computed = bm25(docs, case["question"])
+    if type(observed) is not list or len(observed) != len(docs):
+        raise ValueError(f"{case['qid']} invalid BM25 score vector")
+    scores = {}
+    for doc, value in zip(docs, observed, strict=True):
+        pid = doc["id"]
+        score = computed[pid]
+        if type(value) is not float or not math.isfinite(value):
+            raise ValueError(f"{case['qid']} invalid BM25 score for {pid}")
+        if score == 0:
+            require_equal(f"{case['qid']} zero BM25 score for {pid}", score, value)
+        elif not (
+            math.nextafter(score, -math.inf, steps=4)
+            <= value
+            <= math.nextafter(score, math.inf, steps=4)
+        ):
+            raise ValueError(f"{case['qid']} BM25 score differs for {pid}")
+        scores[pid] = value
+    return scores
+
+
 def replay_split(base, ds, split, ids, frozen, tmp):
     path = base / ds / split
     cases = canonical_rows(base, ds, split, "cases")
@@ -268,9 +292,14 @@ def replay_split(base, ds, split, ids, frozen, tmp):
             ids_and_scores = {d["id"]: v for d, v in zip(docs, dense, strict=True)}
             for pid, score in ids_and_scores.items():
                 independent = float(qvec @ vectors["d:" + pid].astype(np.float64))
-                if not math.isfinite(score) or abs(independent - score) > 3e-7:
+                if (
+                    type(score) is not float
+                    or not math.isfinite(score)
+                    or abs(independent - score) > 3e-7
+                ):
                     raise ValueError(f"{q} dense score differs from vectors")
-            yield build_graph(docs), bm25(docs, c["question"]), ids_and_scores
+            sparse = verified_bm25(c, runs[q]["scores"]["bm25"])
+            yield build_graph(docs), sparse, ids_and_scores
 
     prepared = prepare()
     if split == "train":
@@ -308,6 +337,31 @@ def replay_split(base, ds, split, ids, frozen, tmp):
     return None
 
 
+def check_retrieval_estimates(primary, observed):
+    # The two-sided fair-coin tail is an exact integer ratio. Reference both
+    # SciPy's local calculation and the recorded calculation to that same value.
+    checked = {}
+    for ds, result in primary.items():
+        wins, losses = result["wins"], result["losses"]
+        n = wins + losses
+        tail = sum(math.comb(n, i) for i in range(min(wins, losses) + 1))
+        reference = min(1.0, (2 * tail) / (1 << n))
+        recorded = observed[ds]["p"]
+        for value in (result["p"], recorded):
+            if (
+                type(value) is not float
+                or not 0 <= value <= 1
+                or not math.isclose(value, reference, rel_tol=1e-13, abs_tol=0)
+            ):
+                raise ValueError(f"{ds} binomial p differs from exact tail")
+        checked[ds] = {**result, "p": recorded}
+    for result, adjusted in zip(
+        checked.values(), holm([r["p"] for r in checked.values()]), strict=True
+    ):
+        result["p_holm"] = adjusted
+    require_equal("retrieval paired estimates", checked, observed)
+
+
 def replay_retrieval(base):
     frozen = read(base / "frozen.json")
     require_equal(
@@ -340,11 +394,7 @@ def replay_retrieval(base):
                 result = replay_split(base, ds, split, ids, frozen[ds], Path(tmp))
                 if result is not None:
                     primary[ds] = result
-    for result, adjusted in zip(
-        primary.values(), holm([r["p"] for r in primary.values()]), strict=True
-    ):
-        result["p_holm"] = adjusted
-    require_equal("retrieval paired estimates", primary, read(base / "primary.json"))
+    check_retrieval_estimates(primary, read(base / "primary.json"))
 
 
 def check_prediction(tok, row):

@@ -59,9 +59,9 @@ function firstFocus(ranks) {
     : null;
   state.mention = 0;
 }
-function resetRun() {
+function invalidateRun() {
   ++revision;
-  engine.reset();
+  engine.cancelPending();
   state.live = null;
   $("run").disabled = false;
 }
@@ -161,7 +161,7 @@ function sampleMenus() {
 }
 function setMode(mode) {
   if (state.mode === mode) return;
-  resetRun();
+  invalidateRun();
   message("");
   state.mode = mode;
   if (!isLive() && state.depth === 0) state.depth = 2;
@@ -189,7 +189,7 @@ function setMode(mode) {
   if (isLive()) $("query").focus();
 }
 async function loadCase(ds, j) {
-  resetRun();
+  invalidateRun();
   const ticket = revision;
   Object.assign(state, {
     ds,
@@ -243,7 +243,7 @@ async function run(event) {
     return;
   }
   const question = $("query").value;
-  resetRun();
+  invalidateRun();
   const ticket = revision;
   state.focus = null;
   state.edge = null;
@@ -284,7 +284,7 @@ $("custom").onclick = () => modeClick("custom");
 $("live-form").onsubmit = run;
 $("query").oninput = () => {
   if (state.c && (state.live || $("run").disabled)) {
-    resetRun();
+    invalidateRun();
     message("");
     renderCase();
   }
@@ -345,12 +345,14 @@ function navigate() {
     });
   if (activePage && activePage !== page) {
     window.scrollTo(0, 0);
-    const h = $(page).querySelector("h1");
-    h.tabIndex = -1;
-    h.focus({ preventScroll: true });
+    $(page).querySelector("h1").focus({ preventScroll: true });
   }
   activePage = page;
 }
+document.querySelector(".skip").onclick = (event) => {
+  event.preventDefault();
+  $(activePage).querySelector("h1").focus();
+};
 window.addEventListener("hashchange", navigate);
 bindParity();
 navigate();

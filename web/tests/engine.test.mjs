@@ -26,17 +26,33 @@ const payload = {
   question: "Café?",
   depth: 2,
 };
-test("a reset rejects the pending request and late old-worker replies cannot bind to the next context", async () => {
+test("cancelling a context change rejects the pending request and late old-worker replies cannot bind to the next context", async () => {
   const { client, workers } = harness();
   const first = client.run(payload);
   const rejected = assert.rejects(first, { name: "AbortError" });
-  client.reset();
-  const second = client.run(payload);
+  client.cancelPending();
+  const second = client.run({
+    ...payload,
+    documents: [{ id: "b", title: "Other", text: "Another context" }],
+  });
   workers[0].reply("stale");
   workers[1].reply("fresh");
   assert.equal(await second, "fresh");
   await rejected;
   assert.equal(workers[0].dead, true);
+});
+test("edits and successive queries reuse a ready worker", async () => {
+  const { client, workers } = harness();
+  const first = client.run(payload);
+  workers[0].reply("first");
+  assert.equal(await first, "first");
+  client.cancelPending(); // Edit after displaying the first result.
+  const next = client.run({ ...payload, question: "Second question?" });
+  assert.equal(workers.length, 1);
+  assert.equal(workers[0].last.payload.question, "Second question?");
+  workers[0].reply("second");
+  assert.equal(await next, "second");
+  assert.equal(workers[0].dead, undefined);
 });
 test("an initialization error rejects, terminates, and retries using a fresh worker", async () => {
   const { client, workers } = harness();

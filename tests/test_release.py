@@ -228,3 +228,90 @@ def test_reproduction_validates_elapsed_evidence(reproduced_sources, name, key, 
     artifacts[name + "/elapsed.json"] = damaged[corruption]
     with pytest.raises(ValueError):
         check()
+
+
+def test_bm25_replay_accepts_linux_rounding_and_keeps_historical_ranks(monkeypatch, tmp_path):
+    import math
+    from pathlib import Path
+
+    from benchmarks.release import read, table
+    from benchmarks.run_retrieval import evaluate_case, write_shards
+    from benchmarks.verify import fixed_shards, verified_bm25
+    from graphmind import bm25, build_graph
+
+    root = Path(__file__).resolve().parents[1] / "results/retrieval"
+    sample = root / "musique/train"
+    qid = "4hop1__771620_317689_1286_19331"
+    case = next(r for r in table(sample / "cases") if r["qid"] == qid)
+    run = next(r for r in table(sample / "runs") if r["qid"] == qid)
+    docs = case["documents"]
+    score = run["scores"]["bm25"]
+    assert (score[14], score[16]) == (5.847271371822889, 8.203580623851579)
+    linux = bm25(docs, case["question"])
+    linux[docs[14]["id"]] = 5.84727137182289
+    linux[docs[16]["id"]] = 8.20358062385158
+    monkeypatch.setattr("benchmarks.verify.bm25", lambda *_: linux)
+    checked = verified_bm25(case, score)
+    assert list(checked.values()) == score
+    dense = {d["id"]: v for d, v in zip(docs, run["scores"]["dense"], strict=True)}
+    config = read(root / "frozen.json")["musique"]
+    rebuilt, _ = evaluate_case(case, (build_graph(docs), checked, dense), config)
+    write_shards(tmp_path, [run])
+    fixed_shards(tmp_path, [rebuilt])
+
+    for invalid in (math.nextafter(linux[docs[14]["id"]], math.inf, steps=5), 5.84, True, 5):
+        with pytest.raises(ValueError, match="BM25"):
+            verified_bm25(case, [*score[:14], invalid, *score[15:]])
+    for invalid in (0, False, -0.0, math.ulp(0.0), math.nan, math.inf):
+        forged = score.copy()
+        forged[score.index(0.0)] = invalid
+        with pytest.raises(ValueError, match="BM25"):
+            verified_bm25(case, forged)
+
+    run["rankings"]["bm25"][:2] = reversed(run["rankings"]["bm25"][:2])
+    write_shards(tmp_path / "forged", [run])
+    with pytest.raises(ValueError, match="reconstructed records"):
+        fixed_shards(tmp_path / "forged", [rebuilt])
+
+
+def test_bm25_replay_resolves_near_tie_from_validated_original_scores(monkeypatch):
+    import math
+
+    from benchmarks.run_retrieval import ranked
+    from benchmarks.verify import verified_bm25
+
+    case = {"qid": "q", "question": "alias", "documents": [{"id": "a"}, {"id": "b"}]}
+    high = math.nextafter(1.0, math.inf)
+    local = {"a": high, "b": 1.0}
+    monkeypatch.setattr("benchmarks.verify.bm25", lambda *_: local)
+    assert ranked(local) == ["a", "b"]
+    assert ranked(verified_bm25(case, [1.0, high])) == ["b", "a"]
+
+
+def test_retrieval_inference_checks_tail_with_relative_error_and_exact_counts_and_holm():
+    import math
+    from pathlib import Path
+
+    from benchmarks.release import read
+    from benchmarks.verify import check_retrieval_estimates
+
+    path = Path(__file__).resolve().parents[1] / "results/retrieval/primary.json"
+    observed = read(path)
+    local = copy.deepcopy(observed)
+    for row in local.values():
+        row.pop("p_holm")
+        row["p"] = math.nextafter(row["p"], math.inf)
+    check_retrieval_estimates(local, observed)
+    for field, value in (
+        ("p", 0.0),
+        ("p", observed["hotpot"]["p"] * 1.001),
+        ("p", True),
+        ("p", 0),
+        ("p_holm", math.nextafter(observed["hotpot"]["p_holm"], math.inf)),
+        ("wins", float(observed["hotpot"]["wins"])),
+        ("ties", observed["hotpot"]["ties"] - 1),
+    ):
+        forged = copy.deepcopy(observed)
+        forged["hotpot"][field] = value
+        with pytest.raises(ValueError):
+            check_retrieval_estimates(local, forged)
