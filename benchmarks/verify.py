@@ -107,15 +107,11 @@ def checked_sources(root, recorded):
     require_equal("reader retrieval binding", manifest_hash, answer["retrieval_manifest_sha256"])
     require_equal("reader model", FLAN, answer["model"])
     require_equal("reader settings", SETTINGS, answer["settings"])
-    for key in (
-        "max_new_tokens",
-        "num_beams",
-        "do_sample",
-        "pad_token_id",
-        "eos_token_id",
-        "decoder_start_token_id",
-    ):
-        require_equal("generation config " + key, SETTINGS[key], answer["generation_config"][key])
+    require_equal(
+        "generation config",
+        read(HERE / "reader-generation-config.json"),
+        answer.get("generation_config"),
+    )
     code = answer["source_binding"]
     git_binding(code["commit"], code["source_sha256"])
     audit = read(root / "answers/weight-audit.json")
@@ -137,6 +133,33 @@ def checked_sources(root, recorded):
         (190, 192),
         (audit["checkpoint_tensors"], audit["verified_state_tensors"]),
     )
+    require_equal(
+        "weight audit aliases",
+        {
+            "encoder.embed_tokens.weight": "shared.weight",
+            "decoder.embed_tokens.weight": "shared.weight",
+        },
+        audit.get("aliases"),
+    )
+    # Derived directly from the independently checked official safetensors entries.
+    require_equal(
+        "weight audit tensor hashes",
+        {
+            "shared.weight": "cd5f2d611f4e18966877f60feb20a4e1e92046f7701e615c66b4fdf1c040f81e",
+            "lm_head.weight": "b0de41fb4abe564506e5fded7ed9177afb50ec0f3e9e9c060a3f2a038bea6b14",
+        },
+        audit.get("tensor_sha256"),
+    )
+    for folder, key in (
+        ("retrieval", "measurement_seconds"),
+        ("answers", "model_load_inference_and_scoring_seconds"),
+    ):
+        elapsed = read(root / folder / "elapsed.json")
+        if not isinstance(elapsed, dict) or set(elapsed) != {key}:
+            raise ValueError(f"invalid {folder} elapsed fields")
+        seconds = elapsed[key]
+        if type(seconds) not in (int, float) or seconds <= 0 or not math.isfinite(seconds):
+            raise ValueError(f"invalid {folder} elapsed duration")
     if recorded:
         # Measured predictions, timing and loader audit cannot be regenerated from source text.
         anchor = read(HERE / "vendor/recorded.json")

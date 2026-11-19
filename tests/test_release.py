@@ -108,3 +108,123 @@ def test_weight_free_decode_rejects_changed_answer():
     }
     with pytest.raises(ValueError, match="decoded reader output"):
         check_prediction(tokenizer(), row)
+
+
+@pytest.mark.parametrize("field", ["rankings", "input_ids"])
+def test_json_booleans_cannot_replace_integer_indices(tmp_path, field):
+    from benchmarks.run_retrieval import write_shards
+    from benchmarks.verify import fixed_shards
+
+    expected = {"qid": "q", field: [0, 1, 2]}
+    changed = {"qid": "q", field: [False, True, 2]}
+    write_shards(tmp_path, [changed])
+    with pytest.raises(ValueError, match="reconstructed records"):
+        fixed_shards(tmp_path, [expected])
+
+
+@pytest.fixture
+def reproduced_sources(tmp_path, monkeypatch):
+    """Use real matching source metadata in a minimal, freshly hashed reproduction."""
+    import json
+    import shutil
+    from pathlib import Path
+
+    from benchmarks.release import read
+    from benchmarks.sources import digest
+    from benchmarks.verify import checked_sources
+
+    original = Path(__file__).resolve().parents[1] / "results"
+    # Preserve an actual matched prompt/prediction shard while changing only metadata.
+    for table in ("inputs", "predictions"):
+        shard = Path("answers/hotpot") / table / "0000.jsonl.gz"
+        (tmp_path / shard).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(original / shard, tmp_path / shard)
+    artifacts = {
+        name: read(original / name)
+        for name in (
+            "retrieval/provenance.json",
+            "retrieval/elapsed.json",
+            "answers/binding.json",
+            "answers/elapsed.json",
+            "answers/weight-audit.json",
+        )
+    }
+    sidecar = read(original / "retrieval-provenance.json")
+    artifacts["retrieval/provenance.json"]["source_binding"] = {
+        "commit": sidecar["code_commit"],
+        "source_sha256": sidecar["source_sha256"],
+    }
+    artifacts["answers/weight-audit.json"]["assembly"] = "before-generation"
+    # Git traversal is orthogonal to these mutated fields. Leave inventory validation enabled.
+    monkeypatch.setattr("benchmarks.verify.git_binding", lambda *_: None)
+
+    def write(name, value):
+        file = tmp_path / name
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_bytes(value if isinstance(value, bytes) else json.dumps(value).encode())
+
+    def check():
+        for name, value in artifacts.items():
+            write(name, value)
+        write(
+            "retrieval/manifest.json",
+            {"schema": 1, "files": inventory(tmp_path / "retrieval", ("manifest.json",))},
+        )
+        artifacts["answers/binding.json"]["retrieval_manifest_sha256"] = digest(
+            tmp_path / "retrieval/manifest.json"
+        )
+        write("answers/binding.json", artifacts["answers/binding.json"])
+        write("release.json", {"schema": 1, "files": inventory(tmp_path, ("release.json",))})
+        check_inventory(tmp_path, read(tmp_path / "release.json")["files"], ("release.json",))
+        checked_sources(tmp_path, recorded=False)
+
+    check()
+    return artifacts, check
+
+
+@pytest.mark.parametrize(
+    "key,value", [("min_new_tokens", 48), ("forced_bos_token_id", 42), ("use_cache", 1)]
+)
+def test_reproduction_rejects_altered_decoding_policy(reproduced_sources, key, value):
+    artifacts, check = reproduced_sources
+    artifacts["answers/binding.json"]["generation_config"][key] = value
+    with pytest.raises(ValueError, match="generation config"):
+        check()
+
+
+@pytest.mark.parametrize("key", ["aliases", "tensor_sha256"])
+@pytest.mark.parametrize("operation", ["omit", "change"])
+def test_reproduction_requires_exact_verified_weight_identities(reproduced_sources, key, operation):
+    artifacts, check = reproduced_sources
+    audit = artifacts["answers/weight-audit.json"]
+    if operation == "omit":
+        del audit[key]
+    else:
+        audit[key][next(iter(audit[key]))] = "forged"
+    with pytest.raises(ValueError, match="weight audit"):
+        check()
+
+
+@pytest.mark.parametrize(
+    "name,key",
+    [("answers", "model_load_inference_and_scoring_seconds"), ("retrieval", "measurement_seconds")],
+)
+@pytest.mark.parametrize(
+    "corruption",
+    ["invalid_json", "missing", "extra", "zero", "nan", "infinity", "bool", "negative"],
+)
+def test_reproduction_validates_elapsed_evidence(reproduced_sources, name, key, corruption):
+    artifacts, check = reproduced_sources
+    damaged = {
+        "invalid_json": b"invalid",
+        "missing": {},
+        "extra": {key: 4, "unknown": 5},
+        "zero": {key: 0},
+        "nan": {key: float("nan")},
+        "infinity": {key: float("inf")},
+        "bool": {key: True},
+        "negative": {key: -1},
+    }
+    artifacts[name + "/elapsed.json"] = damaged[corruption]
+    with pytest.raises(ValueError):
+        check()

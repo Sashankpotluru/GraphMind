@@ -3,6 +3,7 @@
 import gzip
 import hashlib
 import json
+from collections.abc import Set as AbstractSet
 from pathlib import Path
 
 from .data import COUNTS, selection
@@ -39,7 +40,15 @@ def inventory(root, exclude=()):
 
 
 def require_equal(label, expected, actual):
-    if expected != actual:
+    # Structural membership comparisons use sets/key views. For JSON records,
+    # canonical encoding distinguishes booleans, integers and floating values.
+    if isinstance(expected, AbstractSet):
+        matches = isinstance(actual, AbstractSet) and expected == actual
+    else:
+        matches = json.dumps(expected, sort_keys=True, allow_nan=False) == json.dumps(
+            actual, sort_keys=True, allow_nan=False
+        )
+    if not matches:
         raise ValueError(f"mismatch: {label}")
 
 
