@@ -1,0 +1,37 @@
+flowchart TB
+    subgraph native["Native Python • supplied candidate contexts"]
+        C["Candidate titles and bodies"] --> B["Build title entities, ownership and mention spans"]
+        B --> G["Undirected paragraph projection"]
+        C --> S["BM25 and pinned MiniLM"]
+        Q["Question"] --> S
+        S --> H["Weighted reciprocal rank fusion"]
+        H --> R["Hybrid-seeded graph expansion • depths 1, 2, 3"]
+        G --> R
+        S --> E["Six rankings per development question"]
+        H --> E
+        R --> E
+    end
+    subgraph selection["Training selection • 500 questions per dataset"]
+        LS["Training support IDs"] --> T["Score the training grid"]
+        TR["Training candidate rankings"] --> T
+    end
+    T -->|frozen parameters| H
+    T -->|frozen parameters| R
+    subgraph evaluation["Official development evaluation"]
+        E --> J["Retrieval scoring"]
+        LD["Development support IDs"] --> J
+        E --> P["Top four paragraphs • dense, hybrid, graph-2"]
+        Q --> P
+        P --> F["Pinned FLAN-T5-small"]
+        F --> A["Answer scoring"]
+        LA["Reference answers"] --> A
+    end
+    E --> V["Verified release • cases, graphs, ranks, prompts, outputs, metrics"]
+    J --> V
+    A --> V
+    subgraph pages["GitHub Pages"]
+        V --> X["Recorded graph explorer and benchmark results"]
+        V -->|selected candidate text| W["Pyodide worker • same Python core"]
+        Q2["Custom question"] --> W
+        W --> U["Live BM25-seeded ranking and exact source mentions"]
+    end

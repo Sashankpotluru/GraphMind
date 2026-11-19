@@ -1,2 +1,9 @@
 # Preserve upstream byte identities and license formatting.
 benchmarks/vendor/** -whitespace
+
+# Generated data, third-party runtime assets and their upstream notices.
+results/** linguist-generated
+benchmarks/vendor/** linguist-vendored
+web/assets/*.woff2 linguist-vendored -diff
+web/assets/*-LICENSE.txt linguist-vendored -whitespace
+site/runtime/** linguist-vendored

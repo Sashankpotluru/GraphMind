@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="758" viewBox="0 0 1080 758" role="img" aria-labelledby="title desc">
+<title id="title">GraphMind</title>
+<desc id="desc">HotpotQA and MuSiQue supply the candidate text. BM25 and MiniLM use the question. Fused scores seed the paragraph graph. Recorded rankings feed FLAN and scoring. Gold labels flow only to training selection and evaluation. A full model-free replay verifies ranks, prompts, outputs and metrics before Pages serves them. A separate browser worker executes custom questions with the same Python core.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#806022"/></marker>
+</defs>
+<style>
+text{font-family:Arial,Helvetica,sans-serif;fill:#40283c}
+.title{font-size:34px;font-weight:700;letter-spacing:-1px}.lane{font-size:20px;font-weight:700}
+.node{font-size:16px;font-weight:700}.sub{font-size:14px;fill:#594b5b}.edge-label{font-size:12px;fill:#6e521f;font-weight:600}
+.box{fill:#fff;stroke:#c6b8ca;stroke-width:1.5}.lane-bg{fill:#f5f0f6;stroke:#ded4e2}.gold{fill:#faf2df;stroke:#c7b17e;stroke-width:1.5}
+.dark{fill:#63284e}.inverse{fill:white}.arrow{fill:none;stroke:#806022;stroke-width:2.1;marker-end:url(#arrow)}
+</style>
+<rect width="1080" height="758" fill="#fffdff"/>
+<text x="28" y="44" class="title">GraphMind</text>
+<text x="235" y="42" class="sub">Retrieval, evaluation and the browser runtime</text>
+
+<rect x="20" y="65" width="1040" height="199" rx="13" class="lane-bg"/>
+<text x="39" y="96" class="lane">Native retrieval</text>
+<rect x="40" y="113" width="218" height="63" rx="7" class="box"/>
+<text x="53" y="137" class="node">HotpotQA and MuSiQue</text><text x="53" y="158" class="sub">Supplied titles and paragraphs</text>
+<rect x="40" y="195" width="218" height="49" rx="7" class="box"/><text x="53" y="224" class="node">Question</text>
+<rect x="311" y="113" width="254" height="63" rx="7" class="box"/>
+<text x="325" y="137" class="node">Title graph</text><text x="325" y="158" class="sub">Ownership, mentions, source spans</text>
+<rect x="311" y="191" width="254" height="59" rx="7" class="box"/>
+<text x="325" y="215" class="node">BM25 + MiniLM</text><text x="325" y="235" class="sub">Weighted reciprocal rank fusion</text>
+<rect x="626" y="142" width="178" height="77" rx="8" class="box"/>
+<text x="640" y="166" class="node">Graph expansion</text><text x="640" y="187" class="sub">Hybrid seeds</text><text x="640" y="206" class="sub">Depths 1, 2 and 3</text>
+<rect x="852" y="142" width="187" height="77" rx="8" class="dark"/>
+<text x="866" y="172" class="node inverse">Recorded rankings</text><text x="866" y="194" class="sub inverse">Six methods per case</text>
+<path class="arrow" d="M259 141H307"/><path class="arrow" d="M259 163L307 202"/><path class="arrow" d="M259 222H307"/>
+<path class="arrow" d="M566 143H587L622 163"/><path class="arrow" d="M566 219H587L622 201"/><path class="arrow" d="M805 180H848"/>
+
+<rect x="20" y="278" width="1040" height="160" rx="13" class="lane-bg"/>
+<text x="39" y="311" class="lane">Evaluation</text>
+<rect x="40" y="332" width="217" height="80" rx="7" class="gold"/>
+<text x="54" y="355" class="node">Gold annotations</text><text x="54" y="377" class="sub">Supporting paragraph IDs</text><text x="54" y="396" class="sub">and reference answers</text>
+<rect x="328" y="332" width="264" height="80" rx="7" class="box"/>
+<text x="342" y="355" class="node">Train selection and dev scoring</text><text x="342" y="377" class="sub">Freeze settings on training questions.</text><text x="342" y="396" class="sub">Score retrieval and reader outputs.</text>
+<rect x="779" y="332" width="260" height="80" rx="7" class="box"/>
+<text x="793" y="355" class="node">FLAN-T5-small</text><text x="793" y="377" class="sub">Question + top four passages</text><text x="793" y="396" class="sub">600 recorded responses</text>
+<path class="arrow" d="M258 372H324"/>
+<path class="arrow" d="M930 220V328"/><text x="938" y="304" class="edge-label">Top four</text>
+<path class="arrow" d="M869 220V292H530V328"/><text x="604" y="286" class="edge-label">All six rankings</text>
+<path class="arrow" d="M778 372H596"/><text x="635" y="362" class="edge-label">Reader outputs</text>
+
+<rect x="20" y="454" width="1040" height="92" rx="13" class="lane-bg"/>
+<text x="39" y="505" class="lane">Release verification</text>
+<rect x="328" y="470" width="711" height="59" rx="7" class="box"/>
+<text x="342" y="494" class="node">Replay the frozen experiment and check the full artifact inventory</text>
+<text x="342" y="516" class="sub">Reconstruct graphs, rankings and prompts. Verify decoded outputs, scores and hashes.</text>
+<path class="arrow" d="M461 413V466"/><path class="arrow" d="M911 413V466"/>
+
+<rect x="20" y="563" width="1040" height="174" rx="13" class="lane-bg"/>
+<text x="39" y="598" class="lane">GitHub Pages</text>
+<rect x="40" y="628" width="257" height="80" rx="7" class="box"/>
+<text x="54" y="653" class="node">Verified records</text><text x="54" y="675" class="sub">Cases, ranks, answers and scores</text><text x="54" y="695" class="sub">Hash-checked evidence shards</text>
+<rect x="355" y="628" width="235" height="80" rx="7" class="dark"/>
+<text x="370" y="660" class="node inverse">Evidence workspace</text><text x="370" y="683" class="sub inverse">Graph, spans and rankings</text>
+<rect x="667" y="628" width="372" height="80" rx="7" class="box"/>
+<text x="681" y="653" class="node">Live Python worker in the browser</text><text x="681" y="675" class="sub">Custom question + selected candidate text</text><text x="681" y="695" class="sub">Same graph engine with BM25 seeds</text>
+<path class="arrow" d="M462 530V580H259V624"/><path class="arrow" d="M298 668H351"/><path class="arrow" d="M666 668H594"/>
+</svg>

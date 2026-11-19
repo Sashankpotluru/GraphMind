@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GraphMind | Evidence explorer</title>
+    <meta
+      name="description"
+      content="Trace how exact title mentions change evidence retrieval on HotpotQA and MuSiQue."
+    />
+    <link rel="icon" href="./assets/mark.svg" />
+    <link rel="stylesheet" href="./style.css" />
+    <script type="module" src="./app.mjs"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="topbar">
+      <div class="frame bar">
+        <a class="brand" href="#workspace"
+          ><img src="./assets/mark.svg" width="32" height="32" alt="" />
+          GraphMind</a
+        >
+        <nav aria-label="Main">
+          <a href="#workspace">Workspace</a><a href="#results">Results</a
+          ><a href="#architecture">Architecture</a>
+        </nav>
+        <a
+          class="source-link"
+          href="https://github.com/Sashankpotluru/GraphMind"
+          >GitHub <span aria-hidden="true">↗</span></a
+        >
+      </div>
+    </header>
+    <main class="frame" id="main">
+      <section id="workspace" aria-labelledby="workspace-heading">
+        <div class="mast">
+          <div>
+            <h1 id="workspace-heading">GraphMind</h1>
+            <p>Trace title mentions across a question’s supplied paragraphs.</p>
+          </div>
+          <div class="mode-switch" aria-label="Question mode">
+            <button id="recorded" aria-pressed="true">Recorded question</button
+            ><button id="custom" aria-pressed="false">Custom question</button>
+          </div>
+        </div>
+        <div class="query-box">
+          <div class="query-controls">
+            <label
+              >Dataset
+              <select id="dataset">
+                <option value="hotpot">HotpotQA</option>
+                <option value="musique">MuSiQue</option>
+              </select></label
+            >
+            <label class="sample-label"
+              >Context
+              <select id="sample" aria-label="Sample context"></select
+            ></label>
+            <div class="arrows">
+              <button id="prev" aria-label="Previous context">‹</button
+              ><button id="next" aria-label="Next context">›</button>
+            </div>
+            <span id="sample-meta"></span>
+          </div>
+          <h2 id="question">Loading the first question…</h2>
+          <form id="live-form" hidden novalidate>
+            <div class="live-tools">
+              <label for="query">Your question about these paragraphs</label>
+              <label
+                >Live graph depth
+                <select id="live-depth">
+                  <option value="0">0 hops (BM25)</option>
+                  <option value="1">1 hop</option>
+                  <option value="2" selected>2 hops</option>
+                  <option value="3">3 hops</option>
+                </select></label
+              >
+            </div>
+            <div class="query-input">
+              <textarea
+                id="query"
+                rows="2"
+                placeholder="Ask a question using this context"
+              ></textarea
+              ><button class="primary" id="run">Run retrieval</button>
+            </div>
+            <p>
+              Runs BM25 and graph expansion locally in Python. Each question
+              uses the selected dataset context.
+            </p>
+          </form>
+        </div>
+        <div id="workspace-status" role="status" aria-live="polite"></div>
+        <button id="retry" hidden>Retry loading this context</button>
+        <div id="case-content" hidden>
+          <div class="board">
+            <section class="map-panel" aria-labelledby="map-head">
+              <div class="panel-head">
+                <div>
+                  <h2 id="map-head">Evidence map</h2>
+                  <p id="map-stats"></p>
+                </div>
+                <label class="method-label"
+                  >Retrieval method<select id="method">
+                    <option value="graph">Graph expansion</option>
+                    <option value="hybrid">Hybrid RRF</option>
+                    <option value="dense">Dense · MiniLM</option>
+                    <option value="bm25">BM25</option>
+                  </select></label
+                >
+              </div>
+              <div class="plot-area">
+                <svg
+                  id="plot"
+                  viewBox="0 0 690 316"
+                  role="group"
+                  aria-label="Paragraph neighborhood graph"
+                ></svg>
+                <div class="key">
+                  <span><i class="dot"></i> Focus paragraph</span
+                  ><span><i class="line"></i> Undirected link</span>
+                </div>
+              </div>
+              <div class="map-foot">
+                <label
+                  >Graph depth
+                  <select id="depth">
+                    <option value="1">1 hop</option>
+                    <option value="2" selected>2 hops</option>
+                    <option value="3">3 hops</option>
+                  </select></label
+                >
+                <label class="reveal"
+                  ><input type="checkbox" id="support" /> Reveal support</label
+                >
+              </div>
+              <div class="map-controls">
+                <label>Focus paragraph<select id="focus"></select></label>
+                <label>Inspect connection<select id="edge"></select></label>
+              </div>
+            </section>
+            <aside class="inspector" aria-labelledby="inspect-head">
+              <div class="inspect-label">
+                <span class="pin" aria-hidden="true">◎</span>
+                <h2 id="inspect-head">Evidence inspector</h2>
+              </div>
+              <div id="inspection"></div>
+            </aside>
+          </div>
+          <div class="lower">
+            <section>
+              <h2>Candidate ranking</h2>
+              <p class="sub" id="rank-summary"></p>
+              <label class="rank-filter"
+                >Show ranks
+                <select id="rank-filter">
+                  <option value="top">Top four</option>
+                  <option value="all">All candidates</option>
+                  <option value="gold" disabled>Gold support only</option>
+                </select></label
+              >
+              <div id="rank-list"></div>
+            </section>
+            <section id="reader">
+              <h2>Recorded reader answers</h2>
+              <p class="sub">
+                FLAN-T5-small read the first four paragraphs from each ranking.
+              </p>
+              <div id="responses"></div>
+            </section>
+          </div>
+        </div>
+        <p class="scope">
+          The explorer covers 200 hash-selected contexts. Retrieval evaluation
+          covers all 9,822 official development questions. Each question uses
+          the dataset’s supplied candidates, which include its supporting
+          paragraphs.
+        </p>
+      </section>
+      <section id="results" hidden aria-labelledby="results-heading">
+        <div class="mast">
+          <div>
+            <h1 id="results-heading">Benchmark results</h1>
+            <p>
+              Each question ranks its supplied candidate paragraphs, which
+              already contain the annotated evidence. The search space is
+              limited to that context.
+            </p>
+          </div>
+        </div>
+        <div id="results-content" aria-live="polite"></div>
+      </section>
+      <section id="architecture" hidden aria-labelledby="arch-heading">
+        <div class="mast">
+          <div>
+            <h1 id="arch-heading">Architecture</h1>
+            <p>
+              From source paragraphs to ranked evidence and back to the exact
+              mention.
+            </p>
+          </div>
+        </div>
+        <figure class="architecture">
+          <img
+            src="./docs/architecture.svg"
+            alt="Three paths show corpus-only graph construction, frozen retrieval and answer evaluation, and the same Python retriever running in a browser worker. Gold labels enter tuning and scoring."
+          />
+          <figcaption>
+            <a href="./docs/architecture.svg">Open full-size diagram</a
+            ><a href="./docs/architecture.mmd">Mermaid source</a>
+          </figcaption>
+        </figure>
+        <div class="arch-bottom">
+          <section>
+            <h2>Read the implementation</h2>
+            <p>
+              Graphs contain paragraphs, their title entities, ownership links
+              and exact mentions. The paragraph projection preserves the source
+              edges behind every connection.
+            </p>
+            <a href="https://github.com/Sashankpotluru/GraphMind#readme"
+              >Repository README</a
+            >
+            ·
+            <a
+              href="https://github.com/Sashankpotluru/GraphMind/blob/main/docs/engine-contract.md"
+              >Python API</a
+            >
+          </section>
+          <section>
+            <h2>Check browser parity</h2>
+            <p>
+              Run an authored bridge and one real HotpotQA context. The check
+              compares rankings, score components, hops, seed contributions and
+              graph spans with native Python.
+            </p>
+            <button id="parity" class="primary">Run browser check</button>
+            <p id="parity-status" role="status"></p>
+          </section>
+        </div>
+      </section>
+    </main>
+    <footer class="frame">
+      <span>GraphMind</span>
+      <div>
+        <a
+          href="https://github.com/Sashankpotluru/GraphMind#reproduce-the-experiment"
+          >Reproduce the experiment</a
+        ><a
+          href="https://github.com/Sashankpotluru/GraphMind/blob/main/THIRD_PARTY_NOTICES.md"
+          >Sources &amp; licenses</a
+        >
+      </div>
+    </footer>
+    <noscript
+      >Enable JavaScript to explore the graph. All results and source data are
+      also available in the GitHub repository.</noscript
+    >
+  </body>
+</html>

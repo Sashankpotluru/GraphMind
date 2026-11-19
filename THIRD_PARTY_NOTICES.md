@@ -13,3 +13,15 @@ The MIT license covers the original GraphMind code. Dataset and model terms foll
 **FLAN-T5-small.** The matched reader uses Google's Apache-2.0 FLAN-T5-small release. The unmodified tokenizer JSON is redistributed for weight-free decoding and replay. The weights are downloaded separately. [Pinned model and card](https://huggingface.co/google/flan-t5-small/tree/0fc9ddf78a1e988dac52e2dac162b0ede4fd74ab) · [Apache license text](benchmarks/vendor/flan/LICENSE)
 
 **Answer evaluation.** HotpotQA’s authors distribute their scoring code under Apache 2.0. MuSiQue’s authors distribute their scorer under CC BY 4.0 and credit AllenNLP’s SQuAD tools. The vendored Hotpot module uses the standard JSON import. The MuSiQue answer module uses a relative Metric import. Their answer functions are otherwise unchanged. Pinned source URLs and original SHA-256 values accompany each module. [Source entries](benchmarks/vendor/scorers.json) · [Hotpot license](benchmarks/vendor/hotpot/LICENSE.txt) · [MuSiQue license](benchmarks/vendor/musique/LICENSE)
+
+**Browser runtime.** The demo serves five unmodified files from Pyodide 0.29.3 (CPython 3.13.2) under the same origin as the workspace. The distribution archive is 5,598,203 bytes, SHA-256 `924f3167d6bf5e553bda392615eaa82edd82a9cffc32a1cc49853a926b148c5c`. The selected runtime files total 12,283,621 bytes. The lockfile is upstream loader metadata. Compatible optional packages are listed there, and the deployed worker uses only the standard library. The build downloads the archive into a local cache and unpacks the five listed files into the generated site. [Pinned distribution archive](https://registry.npmjs.org/pyodide/-/pyodide-0.29.3.tgz) · [Pyodide release and corresponding source](https://github.com/pyodide/pyodide/tree/0.29.3) · [Pyodide MPL 2.0](web/assets/Pyodide-LICENSE.txt) · [Python license and acknowledgments](web/assets/Python-LICENSE.txt)
+
+| Runtime file | Bytes | SHA-256 |
+| --- | ---: | --- |
+| pyodide.mjs | 17,616 | `23213d27e9dacbda6f25f955fb38dabfc40ada082c04ee253047ea5dddcaa3b5` |
+| pyodide.asm.js | 1,074,322 | `1263f02b5b26099b96112378156f242dd98b39a8201ba7765e5fe3d455c5ce91` |
+| pyodide.asm.wasm | 8,647,684 | `e2f4ee75b325e35eb31bfb8c613d4dd5098f5502c156a97847686875b5025480` |
+| python_stdlib.zip | 2,423,989 | `4298b6ee445cb724c3973437da47789752b9e6ff4e26619026b283ec801fc46b` |
+| pyodide-lock.json | 120,010 | `3256ffc76388de0e37f4b34d42ab484268d1afc675179ff97b2a5bb14f84ccac` |
+
+**Typography.** The Bricolage Grotesque Project Authors created the typeface used in GraphMind’s interface. The Latin variable-weight subset comes from Fontsource 5.3.0. [Typeface source](https://github.com/ateliertriay/bricolage) · [Fontsource distribution](https://registry.npmjs.org/@fontsource-variable/bricolage-grotesque/-/bricolage-grotesque-5.3.0.tgz) · [SIL Open Font License](web/assets/Font-LICENSE.txt)

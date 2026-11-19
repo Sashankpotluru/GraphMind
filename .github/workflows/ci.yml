@@ -1,0 +1,55 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12', '3.13']
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e . -r requirements-dev.txt -r requirements-replay.txt
+      - name: Check engine, evaluation and site builder
+        run: |
+          python -m pip check
+          ruff check .
+          ruff format --check benchmarks scripts src tests
+          mypy
+          python -m pytest -q
+      - name: Replay the complete release and verify the Pages build
+        run: python scripts/build_site.py
+      - name: Smoke test the wheel from outside the checkout
+        run: |
+          python -m build --wheel --outdir "$RUNNER_TEMP/wheels"
+          python -m venv "$RUNNER_TEMP/smoke"
+          "$RUNNER_TEMP/smoke/bin/python" -m pip install "$RUNNER_TEMP"/wheels/*.whl
+          cd "$RUNNER_TEMP"
+          "$RUNNER_TEMP/smoke/bin/graphmind" query "$GITHUB_WORKSPACE/tests/fixtures/bridge.json" --depth 2 --mix 1 --seeds 1 --output rank.json
+          "$RUNNER_TEMP/smoke/bin/graphmind" export "$GITHUB_WORKSPACE/tests/fixtures/bridge.json" --output export.json
+          "$RUNNER_TEMP/smoke/bin/python" -c 'import json, math; r=json.load(open("rank.json")); assert math.isclose(r["hops"][2]["c"], .5) and len(r["ranking"]) == 4; assert len(json.load(open("export.json"))["statements"]) == 5'
+  worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - run: node --test web/tests/*.test.mjs
