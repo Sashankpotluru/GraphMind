@@ -1,0 +1,38 @@
+[
+  {
+    "path": "data/cache/hotpot-train-00000-of-00002.parquet",
+    "url": "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/1908d6afbbead072334abe2965f91bd2709910ab/distractor/train-00000-of-00002.parquet",
+    "sha256": "76d3bb3048a7cc73c1958107c0c5872a00d7e7d00c105b81e92f6769e7822e68",
+    "bytes": 165624177
+  },
+  {
+    "path": "data/cache/hotpot-train-00001-of-00002.parquet",
+    "url": "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/1908d6afbbead072334abe2965f91bd2709910ab/distractor/train-00001-of-00002.parquet",
+    "sha256": "713661628434fbb19fff7392e2e321e4ed107e3c7c7784d0690946e5f722763f",
+    "bytes": 166162479
+  },
+  {
+    "path": "data/cache/hotpot-validation-00000-of-00001.parquet",
+    "url": "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/1908d6afbbead072334abe2965f91bd2709910ab/distractor/validation-00000-of-00001.parquet",
+    "sha256": "c20b638ca82b21d04fe12e14ff417ad05153d4d215a65de54497fca4e972f7c6",
+    "bytes": 27452575
+  },
+  {
+    "path": "data/cache/musique_ans_v1.0_train.jsonl",
+    "archive_member": "data/musique_ans_v1.0_train.jsonl",
+    "sha256": "83a75b1e11e4e9bb8f8308e72ac40ca617ae4431b3a0d955b61cab259248490a",
+    "bytes": 241046755
+  },
+  {
+    "path": "data/cache/musique_ans_v1.0_dev.jsonl",
+    "archive_member": "data/musique_ans_v1.0_dev.jsonl",
+    "sha256": "15fa63794d18a94ce12411aca6e2327e65b6e83b0b1490efab3f1962e48abf3b",
+    "bytes": 30439728
+  },
+  {
+    "path": "data/cache/musique_v1.0.zip",
+    "url": "https://drive.google.com/uc?id=1tGdADlNjWFaHLeZZGShh2IRcpO6Lv24h",
+    "sha256": "98f839bf2fd5319f5c688aed77901a6d5c30b3b9f9f691ab9a8ecafb045ee0cd",
+    "bytes": 272049578
+  }
+]

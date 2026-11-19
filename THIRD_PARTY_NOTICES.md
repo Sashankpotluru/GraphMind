@@ -1,0 +1,11 @@
+# Third-party material
+
+The MIT license covers the original GraphMind code. Dataset and model terms follow their upstream releases.
+
+**HotpotQA.** Zhilin Yang, Peng Qi, Saizheng Zhang, Yoshua Bengio, William W. Cohen, Ruslan Salakhutdinov and Christopher D. Manning created HotpotQA (2018). The supplied distractor contexts contain Wikipedia article text credited to the article contributors. The dataset and the adapted Hotpot cases remain available under CC BY-SA 4.0. GraphMind concatenates supplied sentences, deduplicates exact title/body pairs, attaches content IDs and extracts lexical links. The original article title in each document or source judgment identifies its article on English Wikipedia and its contribution history. [Dataset and paper](https://hotpotqa.github.io/) · [Official data distribution](https://huggingface.co/datasets/hotpotqa/hotpot_qa) · [License](https://creativecommons.org/licenses/by-sa/4.0/)
+
+**MuSiQue.** Harsh Trivedi, Niranjan Balasubramanian, Tushar Khot and Ashish Sabharwal created MuSiQue (2022). The authors distribute MuSiQue under CC BY 4.0. The source draws on SQuAD, T-REx, Natural Questions, MLQA and Zero Shot RE. Each candidate's source title identifies its Wikipedia article and contributors. GraphMind retains the supplied title and body, maps paragraph support to content IDs, deduplicates exact pairs and derives lexical links. The adapted MuSiQue material retains its dataset attribution and CC BY 4.0 terms. [Authors' repository, source and usage notes](https://github.com/StonyBrookNLP/musique) · [License](https://creativecommons.org/licenses/by/4.0/)
+
+**MiniLM.** The sentence-transformers all-MiniLM-L6-v2 release is licensed under Apache 2.0. The benchmark uses its verified tokenizer/configuration and safetensors weights locally. The repository publishes derived numeric representations and retrieval outputs. [Pinned model and card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/tree/1110a243fdf4706b3f48f1d95db1a4f5529b4d41) · [License](https://www.apache.org/licenses/LICENSE-2.0)
+
+**Evaluation software.** The independent metric comparison uses pytrec_eval-terrier, a Python interface to NIST trec_eval. Reproduction installs the package separately. [Python interface](https://github.com/terrierteam/pytrec_eval) · [NIST trec_eval](https://github.com/usnistgov/trec_eval)
