@@ -1,0 +1,9 @@
+{
+  "question": "Where were indigo sails woven?",
+  "documents": [
+    {"id": "a", "title": "Lark Expedition", "text": "The indigo sails went to Bell Harbor."},
+    {"id": "b", "title": "Bell Harbor", "text": "Its workshops hired weavers from Rowan Vale."},
+    {"id": "c", "title": "Rowan Vale", "text": "The valley hosted a weaving school."},
+    {"id": "d", "title": "North Quarry", "text": "Granite is cut here."}
+  ]
+}

@@ -1,0 +1,6 @@
+build==1.6.1
+mypy==2.4.1
+pytest==9.2.0
+ruff==0.17.5
+setuptools==84.2.1
+wheel==0.48.0
