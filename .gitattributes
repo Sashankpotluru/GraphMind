@@ -1,0 +1,2 @@
+# Preserve upstream byte identities and license formatting.
+benchmarks/vendor/** -whitespace

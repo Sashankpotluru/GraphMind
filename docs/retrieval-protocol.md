@@ -45,7 +45,7 @@ From the checkout root in a Python 3.12+ virtual environment:
 ```sh
 python -m pip install -e . -r requirements-benchmark.txt
 python -m scripts.download_data --cache data/cache
-python -m benchmarks.run_retrieval --cache data/cache --output results/retrieval
+python -m benchmarks.run_retrieval --cache data/cache --output reproductions/run-01/retrieval
 ```
 
 Choose a new output directory for a reproduction. The runner stages hashed shards in a sibling temporary directory and publishes the complete directory only after every measurement and check succeeds. A failed run leaves its partial observations for inspection. Compressed JSONL case, judgment, run, grid and metric tables use up to 64 records per shard. Vectors occupy little-endian row-major float32 gzip shards with adjacent key/token-length arrays. Public training text is limited to the selected 500 questions per dataset. The retrieval manifest covers all files in the completed directory except itself. A digest authenticates artifact bytes relative to the manifest and cannot establish the origin of a timing or prove that any model executed.

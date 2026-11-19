@@ -13,3 +13,5 @@ data/cache/
 .demo-session/
 .env
 .DS_Store
+.graphmind-staging/
+reproductions/

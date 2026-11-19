@@ -86,6 +86,7 @@ MEASUREMENT_PATHS = (
     "requirements-benchmark.txt",
     "pyproject.toml",
     "docs/retrieval-protocol.md",
+    "docs/answer-protocol.md",
 )
 
 

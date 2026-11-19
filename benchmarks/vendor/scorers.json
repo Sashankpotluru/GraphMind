@@ -1,0 +1,58 @@
+[
+  {
+    "dataset": "hotpot",
+    "repository": "hotpotqa/hotpot",
+    "revision": "3635853403a8735609ee997664e1528f4480762a",
+    "source_path": "hotpot_evaluate_v1.py",
+    "url": "https://raw.githubusercontent.com/hotpotqa/hotpot/3635853403a8735609ee997664e1528f4480762a/hotpot_evaluate_v1.py",
+    "sha256": "d35fc91a6db21d791dbdda11daf3856e9359f5701d54e3eefba20d88fecc02c0"
+  },
+  {
+    "dataset": "hotpot",
+    "repository": "hotpotqa/hotpot",
+    "revision": "3635853403a8735609ee997664e1528f4480762a",
+    "source_path": "LICENSE.txt",
+    "url": "https://raw.githubusercontent.com/hotpotqa/hotpot/3635853403a8735609ee997664e1528f4480762a/LICENSE.txt",
+    "sha256": "9c264489d021e5905c0544f75e292c63f78dca56acd2aec395dd36dcc41940c7"
+  },
+  {
+    "dataset": "musique",
+    "repository": "StonyBrookNLP/musique",
+    "revision": "922ac98f19a201998dbdae6d7f2887a5258dbdeb",
+    "source_path": "evaluate_v1.0.py",
+    "url": "https://raw.githubusercontent.com/StonyBrookNLP/musique/922ac98f19a201998dbdae6d7f2887a5258dbdeb/evaluate_v1.0.py",
+    "sha256": "f5fe66ae61dbea5172cba9d428d9924a5811f3457edc945fc1d81369c30e74b7"
+  },
+  {
+    "dataset": "musique",
+    "repository": "StonyBrookNLP/musique",
+    "revision": "922ac98f19a201998dbdae6d7f2887a5258dbdeb",
+    "source_path": "metrics/answer.py",
+    "url": "https://raw.githubusercontent.com/StonyBrookNLP/musique/922ac98f19a201998dbdae6d7f2887a5258dbdeb/metrics/answer.py",
+    "sha256": "10368f619b4d5ef5d83748c05a96c0afd332a14ab5c010740c98d58dfaefe974"
+  },
+  {
+    "dataset": "musique",
+    "repository": "StonyBrookNLP/musique",
+    "revision": "922ac98f19a201998dbdae6d7f2887a5258dbdeb",
+    "source_path": "metrics/metric.py",
+    "url": "https://raw.githubusercontent.com/StonyBrookNLP/musique/922ac98f19a201998dbdae6d7f2887a5258dbdeb/metrics/metric.py",
+    "sha256": "c858d1bfda2f0b005065e87a402cd2f82154eb7eed5916845ae130759cc3a299"
+  },
+  {
+    "dataset": "musique",
+    "repository": "StonyBrookNLP/musique",
+    "revision": "922ac98f19a201998dbdae6d7f2887a5258dbdeb",
+    "source_path": "metrics/__init__.py",
+    "url": "https://raw.githubusercontent.com/StonyBrookNLP/musique/922ac98f19a201998dbdae6d7f2887a5258dbdeb/metrics/__init__.py",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "dataset": "musique",
+    "repository": "StonyBrookNLP/musique",
+    "revision": "922ac98f19a201998dbdae6d7f2887a5258dbdeb",
+    "source_path": "LICENSE",
+    "url": "https://raw.githubusercontent.com/StonyBrookNLP/musique/922ac98f19a201998dbdae6d7f2887a5258dbdeb/LICENSE",
+    "sha256": "cce5d01fa4a83b794271bd2c28cffdf99afd43c803e6ddefddae39b591ea7448"
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "hotpot": {
+    "train": {
+      "cases": "beb4f8a5489f6a8676c3bf46bbfd301246dfb26ae5ceb87817c1160fb52efee4",
+      "judgments": "44e783da96e4801633969067720aa2c345da2a651c299aae1ebb6784cbd98f0c"
+    },
+    "dev": {
+      "cases": "eebe022140b1c0160481e1d68f985a9a79d2c28b3b039d59953687761d3d55df",
+      "judgments": "cedbb81d0c169e2ebc0f012244a95d57b834336f5bc927b97aa68c41226c7fb8"
+    },
+    "membership": "d02ff533bf7081531747e82065f07cd5b59a5c2957910746c340706b8ec08ed2",
+    "source_audit": "3153b380a693c967abe9f76cfa55295922556a362b147712559618d323ad968f"
+  },
+  "musique": {
+    "train": {
+      "cases": "1a2b864f13c39a909004c04e2ba288af0c10435da16f0a492e9f18a84902a2c0",
+      "judgments": "7c3be89086ce39e725a4ea8a42f879daa400b07df11d97963fee6a6d414986bc"
+    },
+    "dev": {
+      "cases": "e7238a375fbb8d8da4a54e6fc5b6d5c6f9c29acf08b58927583a9d0c09913311",
+      "judgments": "df9ca2c15b6de509f2a6432eebc39544cd9559892c0b41cac626fe6f5e9849e0"
+    },
+    "membership": "f84bf96abb51c9a946e8a025a3e30af45a62e6bdf830dade5def34241a927c26",
+    "source_audit": "5c50d49e0d8f83e3331075999fc96dbabd1911db0eec4887ea67788c2a9e3536"
+  }
+}
