@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "assembly": "post-run",
+  "recorded_run": "retrieval",
+  "manifest_sha256": "a8b84048a64817155acf3f0697bce3c2df8cb31f293a54a54069c4017dd457e8",
+  "code_commit": "6488ee09e0bb8ff0c58d82c82d00e85149b4f87e",
+  "engine_review_commit": "7b60cabe296b19f11eb03caf825bbafa9c1b198e",
+  "source_sha256": {
+    "benchmarks/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "benchmarks/data.py": "35216832092db798ddaf8843f4b34330e30ee1508c83ab9c288be1e6629fad7c",
+    "benchmarks/evaluate.py": "da09af9ac03a4e1f2528f3c85b0e3086f177f32b28c116fe327fbe25cf08700d",
+    "benchmarks/model.json": "763d54daa12729cd6d48c64e08081e3fca7babeaf5de4a3e0d4aff9eaa11a756",
+    "benchmarks/models.py": "762773373cc52b12d500ae55130d8458e3d1354c873fac8923328e86c8a3f48a",
+    "benchmarks/run_retrieval.py": "7e4bcc9e1b24d028d59f71949d36c4519155ca2a733d8cca5db6cf571b07915d",
+    "benchmarks/sources.json": "d2ba4ec24884b51259947722b701d53d5ef8a05fc8ce946b63c0c8a1145a06d7",
+    "benchmarks/sources.py": "5c7f3fb61a4b34501d59846f91501d86161b2d52392650521a83a3a09f89a4a3",
+    "benchmarks/statistics.py": "6b9f0f4b365f19e51333b777a8e06f3281325e63e567192f9764121b45b2ad77",
+    "docs/retrieval-protocol.md": "d73a9e483207911ae727feac4bad98098e5d47e01accc71b29ce8379b8b14897",
+    "pyproject.toml": "c8bee415dd1574297db8689542bb6bb9b3cdb0d3e5cb84f5b6b9fbae61a1655f",
+    "requirements-benchmark.txt": "474115254f6647274f25001517176d2ea910cb8e2f8f1839c4e80968a81d1477",
+    "scripts/download_data.py": "c175ca4ae71652c1d29513088f753058c7a2e7bb3cc706ffc03950d3f4393773",
+    "src/graphmind/__init__.py": "12e087a29bea2805990dfb670e5cdd1b33c37553f6fb2c3643f9f2ae16660573",
+    "src/graphmind/cli.py": "552c87516c483fbf4ae30c03d5ce1964672c9b578ae2807d0205baa6ec09d62c",
+    "src/graphmind/documents.py": "f84e3b49121c049de7d17b753568add56a1f8348aa57088b65cc855079843f73",
+    "src/graphmind/export.py": "520b741c9f5cef58e21644e157fcd24f9b57e1d48ed9270e70ddd3164d2dca74",
+    "src/graphmind/graph.py": "7c78e21df834f514300e392b6135824860812254a05c157c4e45c9da27168ae7",
+    "src/graphmind/retrieval.py": "37765eb8ac62a6cc59b2408c72eef53f8f8e59af1522ba1723228f34cd12f943"
+  },
+  "evidence": "The run recorded benchmark module hashes before inference. They match the frozen commit. Its engine files match the reviewed engine commit. The original run did not independently record the Git commit or the imported engine hashes before inference."
+}

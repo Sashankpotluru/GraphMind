@@ -15,12 +15,13 @@ from importlib.metadata import version
 from pathlib import Path
 from statistics import median
 
+import graphmind
 from graphmind import bm25, build_graph, expand
 
 from .data import COUNTS, inventory, selection
 from .evaluate import KEYS, crosscheck, metrics
 from .models import LIMIT, cosine_scores, load_encoder, model_identity
-from .sources import DATA, MODEL, digest, verified
+from .sources import DATA, MODEL, digest, source_binding, verified
 from .statistics import components, holm, summarize
 
 HYBRID_GRID = list(itertools.product((0.25, 0.5, 0.75), (10, 60)))
@@ -348,6 +349,15 @@ def platform_info():
 
 def measure(cache, root):
     start = time.monotonic()
+    checkout = Path(__file__).resolve().parents[1]
+    binding = source_binding(checkout)
+    loaded = Path(graphmind.__file__).resolve().parent
+    for name, expected in binding["source_sha256"].items():
+        if (
+            name.startswith("src/graphmind/")
+            and digest(loaded / Path(name).relative_to("src/graphmind")) != expected
+        ):
+            raise ValueError(f"imported engine differs from bound measurement source: {name}")
     for spec in DATA + MODEL:
         verified(cache / Path(spec["path"]).relative_to("data/cache"), spec)
     settings, identity = model_identity()
@@ -357,6 +367,7 @@ def measure(cache, root):
             "schema": 1,
             "model": settings,
             "encoder_identity": identity,
+            "source_binding": binding,
             "datasets": DATA,
             "hardware": platform_info(),
             "measurement_code": {

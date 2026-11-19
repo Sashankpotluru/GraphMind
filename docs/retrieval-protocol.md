@@ -49,3 +49,9 @@ python -m benchmarks.run_retrieval --cache data/cache --output results/retrieval
 ```
 
 Choose a new output directory for a reproduction. The runner stages hashed shards in a sibling temporary directory and publishes the complete directory only after every measurement and check succeeds. A failed run leaves its partial observations for inspection. Compressed JSONL case, judgment, run, grid and metric tables use up to 64 records per shard. Vectors occupy little-endian row-major float32 gzip shards with adjacent key/token-length arrays. Public training text is limited to the selected 500 questions per dataset. The retrieval manifest covers all files in the completed directory except itself. A digest authenticates artifact bytes relative to the manifest and cannot establish the origin of a timing or prove that any model executed.
+
+## Source binding
+
+The original run was executed after the protocol commit `6488ee09e0bb8ff0c58d82c82d00e85149b4f87e` and recorded the benchmark Python file hashes before inference. After the run, `results/retrieval-provenance.json` was assembled to bind its original manifest bytes to that commit and the reviewed engine tree. The sidecar identifies its post-run assembly. The original observations and original manifest bytes are preserved.
+
+For subsequent reproductions, use a Git checkout. Before inference the runner checks the tracked engine, benchmark code and protocol, rejects staged or unstaged measurement changes and untracked files in measurement paths, verifies imported engine files against the bound Git tree, and records the commit and SHA-256 values in the new run's provenance.

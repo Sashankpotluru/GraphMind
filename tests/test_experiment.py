@@ -28,3 +28,34 @@ def test_dense_dot_replay_uses_full_stored_values():
     q = np.array([0.6, 0.8], dtype="<f4")
     mat = np.array([[1, 0], [0, 1], [-1, 0]], dtype="<f4")
     assert cosine_scores(["b", "c", "a"], mat, q) == pytest.approx({"b": 0.6, "c": 0.8, "a": -0.6})
+
+
+def test_source_binding_detects_changed_engine_and_tracks_frozen_commit(tmp_path):
+    import hashlib
+    import subprocess
+
+    from benchmarks.sources import source_binding
+
+    def git(*args):
+        return subprocess.check_output(["git", "-C", str(tmp_path), *args], text=True).strip()
+
+    git("init", "-q")
+    git("config", "user.name", "Fixture")
+    git("config", "user.email", "fixture@example.invalid")
+    sample = tmp_path / "src/graphmind/graph.py"
+    sample.parent.mkdir(parents=True)
+    sample.write_text("value = 1\n")
+    git("add", "src")
+    git("commit", "-qm", "Fixture measurement")
+    binding = source_binding(tmp_path)
+    assert binding["commit"] == git("rev-parse", "HEAD")
+    assert (
+        binding["source_sha256"]["src/graphmind/graph.py"]
+        == hashlib.sha256(sample.read_bytes()).hexdigest()
+    )
+    sample.write_text("value = 2\n")
+    with pytest.raises(ValueError, match="measurement"):
+        source_binding(tmp_path)
+    git("add", "src")
+    with pytest.raises(ValueError, match="measurement"):
+        source_binding(tmp_path)

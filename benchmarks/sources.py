@@ -75,3 +75,40 @@ def fetch(cache):
                         temp.open("wb") as dest,
                     ):
                         shutil.copyfileobj(src, dest)
+
+
+# Commit binding covers both algorithm and measurement inputs. Other user work
+# in the checkout, such as unrelated documentation, need not be pristine.
+MEASUREMENT_PATHS = (
+    "benchmarks",
+    "src/graphmind",
+    "scripts/download_data.py",
+    "requirements-benchmark.txt",
+    "pyproject.toml",
+    "docs/retrieval-protocol.md",
+)
+
+
+def source_binding(checkout):
+    import subprocess
+
+    def git(*args):
+        return subprocess.check_output(["git", "-C", str(checkout), *args])
+
+    commit = git("rev-parse", "--verify", "HEAD").decode().strip()
+    if git("status", "--porcelain=v1", "--untracked-files=all", "--", *MEASUREMENT_PATHS):
+        raise ValueError(
+            "dirty measurement or engine paths; commit measurement source before running"
+        )
+    names = git("ls-tree", "-r", "-z", "--name-only", commit, "--", *MEASUREMENT_PATHS)
+    hashes = {}
+    for raw in names.split(b"\0"):
+        if not raw:
+            continue
+        name = raw.decode()
+        target = checkout / name
+        expected = hashlib.sha256(git("show", commit + ":" + name)).hexdigest()
+        if target.is_symlink() or digest(target) != expected:
+            raise ValueError(f"measurement file differs from Git source: {name}")
+        hashes[name] = expected
+    return {"commit": commit, "source_sha256": hashes}
