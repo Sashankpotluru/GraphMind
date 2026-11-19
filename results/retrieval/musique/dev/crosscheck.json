@@ -1,0 +1,23 @@
+{
+  "count": {
+    "ndcg@4": 14502,
+    "mrr": 14502,
+    "recall@2": 14502,
+    "all@2": 14502,
+    "recall@4": 14502,
+    "all@4": 14502,
+    "recall@6": 14502,
+    "all@6": 14502
+  },
+  "max_abs": {
+    "ndcg@4": 0,
+    "mrr": 0,
+    "recall@2": 0,
+    "all@2": 0,
+    "recall@4": 0,
+    "all@4": 0,
+    "recall@6": 0,
+    "all@6": 0
+  },
+  "scalars": 116016
+}

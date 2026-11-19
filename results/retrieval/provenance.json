@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "model": {
+    "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "files": {
+      "config.json": "953f9c0d463486b10a6871cc2fd59f223b2c70184f49815e7efbcab5d8908b41",
+      "model.safetensors": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db",
+      "special_tokens_map.json": "303df45a03609e4ead04bc3dc1536d0ab19b5358db685b6f3da123d05ec200e3",
+      "tokenizer.json": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",
+      "tokenizer_config.json": "acb92769e8195aabd29b7b2137a9e6d6e25c476a4f15aa4355c233426c61576b",
+      "vocab.txt": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3"
+    },
+    "max_tokens": 256,
+    "pool": "attention-mask mean then L2",
+    "dtype": "float32",
+    "device": "cpu",
+    "threads": 6,
+    "interop_threads": 1,
+    "batch": 32,
+    "attention": "sdpa",
+    "input": "title LF body / raw question"
+  },
+  "encoder_identity": "7d97700cc1f2383a75dbf802c019fe92fc128c2f3deae41e63ced8cf44795eee",
+  "datasets": [
+    {
+      "path": "data/cache/hotpot-train-00000-of-00002.parquet",
+      "url": "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/1908d6afbbead072334abe2965f91bd2709910ab/distractor/train-00000-of-00002.parquet",
+      "sha256": "76d3bb3048a7cc73c1958107c0c5872a00d7e7d00c105b81e92f6769e7822e68",
+      "bytes": 165624177
+    },
+    {
+      "path": "data/cache/hotpot-train-00001-of-00002.parquet",
+      "url": "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/1908d6afbbead072334abe2965f91bd2709910ab/distractor/train-00001-of-00002.parquet",
+      "sha256": "713661628434fbb19fff7392e2e321e4ed107e3c7c7784d0690946e5f722763f",
+      "bytes": 166162479
+    },
+    {
+      "path": "data/cache/hotpot-validation-00000-of-00001.parquet",
+      "url": "https://huggingface.co/datasets/hotpotqa/hotpot_qa/resolve/1908d6afbbead072334abe2965f91bd2709910ab/distractor/validation-00000-of-00001.parquet",
+      "sha256": "c20b638ca82b21d04fe12e14ff417ad05153d4d215a65de54497fca4e972f7c6",
+      "bytes": 27452575
+    },
+    {
+      "path": "data/cache/musique_ans_v1.0_train.jsonl",
+      "archive_member": "data/musique_ans_v1.0_train.jsonl",
+      "sha256": "83a75b1e11e4e9bb8f8308e72ac40ca617ae4431b3a0d955b61cab259248490a",
+      "bytes": 241046755
+    },
+    {
+      "path": "data/cache/musique_ans_v1.0_dev.jsonl",
+      "archive_member": "data/musique_ans_v1.0_dev.jsonl",
+      "sha256": "15fa63794d18a94ce12411aca6e2327e65b6e83b0b1490efab3f1962e48abf3b",
+      "bytes": 30439728
+    },
+    {
+      "path": "data/cache/musique_v1.0.zip",
+      "url": "https://drive.google.com/uc?id=1tGdADlNjWFaHLeZZGShh2IRcpO6Lv24h",
+      "sha256": "98f839bf2fd5319f5c688aed77901a6d5c30b3b9f9f691ab9a8ecafb045ee0cd",
+      "bytes": 272049578
+    }
+  ],
+  "hardware": {
+    "machine": "arm64",
+    "system": "Darwin",
+    "release": "27.0.0",
+    "python": "3.13.2",
+    "logical_cpus": 12,
+    "processor": "arm",
+    "packages": {
+      "numpy": "2.5.5",
+      "scipy": "1.18.1",
+      "torch": "2.15.0",
+      "transformers": "5.23.0",
+      "tokenizers": "0.23.3",
+      "safetensors": "0.8.0",
+      "pytrec_eval-terrier": "0.5.11",
+      "pyarrow": "26.0.1"
+    },
+    "machdep.cpu.brand_string": "Apple M4 Pro",
+    "hw.memsize": "25769803776",
+    "hw.physicalcpu": "12"
+  },
+  "measurement_code": {
+    "__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "data.py": "35216832092db798ddaf8843f4b34330e30ee1508c83ab9c288be1e6629fad7c",
+    "evaluate.py": "da09af9ac03a4e1f2528f3c85b0e3086f177f32b28c116fe327fbe25cf08700d",
+    "models.py": "762773373cc52b12d500ae55130d8458e3d1354c873fac8923328e86c8a3f48a",
+    "run_retrieval.py": "7e4bcc9e1b24d028d59f71949d36c4519155ca2a733d8cca5db6cf571b07915d",
+    "sources.py": "5c7f3fb61a4b34501d59846f91501d86161b2d52392650521a83a3a09f89a4a3",
+    "statistics.py": "6b9f0f4b365f19e51333b777a8e06f3281325e63e567192f9764121b45b2ad77"
+  }
+}

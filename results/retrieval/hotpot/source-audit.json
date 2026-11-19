@@ -1,0 +1,235 @@
+{
+  "train": {
+    "rows": 90447,
+    "distinct_paragraphs": 483696,
+    "repeated_normalized_question_excess": 8,
+    "invalid_sentence_questions": 22,
+    "invalid_sentence_indices": 22,
+    "sentence_anomalies": [
+      {
+        "qid": "5a7b23ca554299042af8f703",
+        "facts": [
+          [
+            "Minoru Suzuki",
+            2
+          ]
+        ]
+      },
+      {
+        "qid": "5abed6d45542990832d3a0ef",
+        "facts": [
+          [
+            "Jonathan Taylor Thomas",
+            20
+          ]
+        ]
+      },
+      {
+        "qid": "5ab6b2fb5542995eadef0060",
+        "facts": [
+          [
+            "Francis Poulenc",
+            3
+          ]
+        ]
+      },
+      {
+        "qid": "5ae0e2df5542990adbacf6b1",
+        "facts": [
+          [
+            "Pan's Labyrinth",
+            2
+          ]
+        ]
+      },
+      {
+        "qid": "5a8d6138554299585d9e37c7",
+        "facts": [
+          [
+            "Rupert Grint",
+            4
+          ]
+        ]
+      },
+      {
+        "qid": "5ab740165542992aa3b8c7fa",
+        "facts": [
+          [
+            "Walkerville, South Australia",
+            52
+          ]
+        ]
+      },
+      {
+        "qid": "5ab2f812554299545a2cfaee",
+        "facts": [
+          [
+            "Khady Sylla",
+            2
+          ]
+        ]
+      },
+      {
+        "qid": "5ae7e8ef5542994a481bbe05",
+        "facts": [
+          [
+            "Robbie Rist",
+            52
+          ]
+        ]
+      },
+      {
+        "qid": "5ab273ee5542997061209606",
+        "facts": [
+          [
+            "Harry Styles",
+            4
+          ]
+        ]
+      },
+      {
+        "qid": "5a84517355429933447460d5",
+        "facts": [
+          [
+            "William T. Anderson",
+            2
+          ]
+        ]
+      },
+      {
+        "qid": "5a7e5b2455429934daa2fc10",
+        "facts": [
+          [
+            "South Park (season 12)",
+            20
+          ]
+        ]
+      },
+      {
+        "qid": "5a846921554299123d8c2243",
+        "facts": [
+          [
+            "Hutterite",
+            40
+          ]
+        ]
+      },
+      {
+        "qid": "5add66475542992200553af1",
+        "facts": [
+          [
+            "2013 Moore tornado",
+            2
+          ]
+        ]
+      },
+      {
+        "qid": "5a847c91554299123d8c2268",
+        "facts": [
+          [
+            "Savannah cat",
+            2
+          ]
+        ]
+      },
+      {
+        "qid": "5a7b629555429927d897bfa4",
+        "facts": [
+          [
+            "Albany and Schenectady Railroad",
+            30
+          ]
+        ]
+      },
+      {
+        "qid": "5a80577a5542996402f6a4e9",
+        "facts": [
+          [
+            "Buprenorphine",
+            7
+          ]
+        ]
+      },
+      {
+        "qid": "5a8164fb5542995ce29dcbf6",
+        "facts": [
+          [
+            "Jan Hooks",
+            8
+          ]
+        ]
+      },
+      {
+        "qid": "5abe4bb855429965af743eb8",
+        "facts": [
+          [
+            "Drop Dead Fred",
+            2
+          ]
+        ]
+      },
+      {
+        "qid": "5a90abc355429933b8a2058a",
+        "facts": [
+          [
+            "Minister of Defence (India)",
+            11
+          ]
+        ]
+      },
+      {
+        "qid": "5ab6460b5542995eadeeff96",
+        "facts": [
+          [
+            "Rochester Hills, Michigan",
+            2
+          ]
+        ]
+      },
+      {
+        "qid": "5a8c7b125542995e66a47614",
+        "facts": [
+          [
+            "Iowa State Cyclones football",
+            4
+          ]
+        ]
+      },
+      {
+        "qid": "5a8a317455429930ff3c0cef",
+        "facts": [
+          [
+            "Jodie Whittaker",
+            3
+          ]
+        ]
+      }
+    ]
+  },
+  "dev": {
+    "rows": 7405,
+    "distinct_paragraphs": 66635,
+    "repeated_normalized_question_excess": 0,
+    "invalid_sentence_questions": 1,
+    "invalid_sentence_indices": 1,
+    "sentence_anomalies": [
+      {
+        "qid": "5ae61bfd5542992663a4f261",
+        "facts": [
+          [
+            "Jimmy Butler (basketball)",
+            902
+          ]
+        ]
+      }
+    ]
+  },
+  "train_dev_overlap": {
+    "normalized_questions": 0,
+    "paragraph_ids": 41016
+  },
+  "tune_dev_overlap": {
+    "normalized_questions": 0,
+    "paragraph_ids": 789
+  }
+}
